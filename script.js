@@ -610,94 +610,129 @@ function toggleViewer(id) {
 }
 
 const portfolioProjects = {
-    1: {
-        title: 'Peça Mecânica Personalizada',
-        category: 'Modelagem 3D + Impressão',
-        description: 'Componente mecânico de alta precisão desenvolvido através de modelagem 3D e impressão em resina.',
-        gallery: ['https://via.placeholder.com/400x300?text=Peça+1', 'https://via.placeholder.com/400x300?text=Peça+2'],
-        details: 'Projeto 1: escopo, processo de modelagem, impressão em resina com tolerância +/- 0.1mm.',
-        modelId: 1,
-        meta: {
-            Cliente: 'VCreate',
-            Ano: '2026',
-            Status: 'Concluído',
-            Ferramentas: 'Fusion 360, Cura, Impressora SLA'
-        }
+  1: {
+    title: "Peça Mecânica Personalizada",
+    category: "Modelagem 3D + Impressão",
+    description:
+      "Componente mecânico de alta precisão desenvolvido através de modelagem 3D e impressão em resina.",
+    gallery: [
+      "https://via.placeholder.com/400x300?text=Peça+1",
+      "https://via.placeholder.com/400x300?text=Peça+2",
+    ],
+    details:
+      "Projeto 1: escopo, processo de modelagem, impressão em resina com tolerância +/- 0.1mm.",
+    modelId: 1,
+    meta: {
+      Cliente: "VCreate",
+      Ano: "2026",
+      Status: "Concluído",
+      Ferramentas: "Fusion 360, Cura, Impressora SLA",
     },
-    2: {
-        title: 'Prototipagem de Produto',
-        category: 'Modelagem + Engenharia Reversa',
-        description: 'Protótipo funcional desenvolvido através de análise de conceito e modelagem paramétrica.',
-        gallery: ['https://via.placeholder.com/400x300?text=Protótipo+1', 'https://via.placeholder.com/400x300?text=Protótipo+2'],
-        details: 'Projeto 2: digitalização, refinamento de geometria e iteração com cliente.',
-        modelId: 2,
-        meta: {
-            Cliente: 'Cliente X',
-            Ano: '2025',
-            Status: 'Em produção',
-            Ferramentas: 'SolidWorks, 3D Scanner, FDM'
-        }
+  },
+  2: {
+    title: "Prototipagem de Produto",
+    category: "Modelagem + Engenharia Reversa",
+    description:
+      "Protótipo funcional desenvolvido através de análise de conceito e modelagem paramétrica.",
+    gallery: [
+      "https://via.placeholder.com/400x300?text=Protótipo+1",
+      "https://via.placeholder.com/400x300?text=Protótipo+2",
+    ],
+    details:
+      "Projeto 2: digitalização, refinamento de geometria e iteração com cliente.",
+    modelId: 2,
+    meta: {
+      Cliente: "Cliente X",
+      Ano: "2025",
+      Status: "Em produção",
+      Ferramentas: "SolidWorks, 3D Scanner, FDM",
     },
-    3: {
-        title: 'Peça de Complexidade Alta',
-        category: 'Impressão 3D Avançada',
-        description: 'Componente de geometria complexa impresso em múltiplos materiais com acabamento profissional.',
-        gallery: ['https://via.placeholder.com/400x300?text=Complexa+1', 'https://via.placeholder.com/400x300?text=Complexa+2'],
-        details: 'Projeto 3: engenharia de suporte, otimização de topologia e simulação de força.',
-        modelId: 3,
-        meta: {
-            Cliente: 'Indústria Y',
-            Ano: '2024',
-            Status: 'Finalizado',
-            Ferramentas: 'Autodesk Meshmixer, Cura, SLA'
-        }
+  },
+  3: {
+    title: "Peça de Complexidade Alta",
+    category: "Impressão 3D Avançada",
+    description:
+      "Componente de geometria complexa impresso em múltiplos materiais com acabamento profissional.",
+    gallery: [
+      "https://via.placeholder.com/400x300?text=Complexa+1",
+      "https://via.placeholder.com/400x300?text=Complexa+2",
+    ],
+    details:
+      "Projeto 3: engenharia de suporte, otimização de topologia e simulação de força.",
+    modelId: 3,
+    meta: {
+      Cliente: "Indústria Y",
+      Ano: "2024",
+      Status: "Finalizado",
+      Ferramentas: "Autodesk Meshmixer, Cura, SLA",
     },
-    4: {
-        title: 'Reconstrução de Peça Original',
-        category: 'Engenharia Reversa',
-        description: 'Análise completa e reconstrução digital de um componente para documentação e replicação.',
-        gallery: ['https://via.placeholder.com/400x300?text=Reconstrução+1', 'https://via.placeholder.com/400x300?text=Reconstrução+2'],
-        details: 'Projeto 4: escaneamento 3D, retrofit para manufatura e relatório técnico.',
-        modelId: 4,
-        meta: {
-            Cliente: 'OEM Z',
-            Ano: '2023',
-            Status: 'Entrega feita',
-            Ferramentas: 'Geomagic, Inventor, Impressora Multi-material'
-        }
+  },
+  4: {
+    title: "Reconstrução de Peça Original",
+    category: "Engenharia Reversa",
+    description:
+      "Análise completa e reconstrução digital de um componente para documentação e replicação.",
+    gallery: [
+      "https://via.placeholder.com/400x300?text=Reconstrução+1",
+      "https://via.placeholder.com/400x300?text=Reconstrução+2",
+    ],
+    details:
+      "Projeto 4: escaneamento 3D, retrofit para manufatura e relatório técnico.",
+    modelId: 4,
+    meta: {
+      Cliente: "OEM Z",
+      Ano: "2023",
+      Status: "Entrega feita",
+      Ferramentas: "Geomagic, Inventor, Impressora Multi-material",
     },
-    5: {
-        title: 'Montagem Torre Duplas',
-        category: 'Modelo 3D Importado',
-        description: 'Visualização do modelo OBJ/MTL de montagem de torre duplas usando Three.js.',
-        gallery: ['assets/torre dupla/montagem torre dupla - render.png', 'assets/torre dupla/3d printed.jpeg'],
-        details: 'Projeto 5: montagem realística e composição estrutural com analise de tensões.',
-        modelId: 5,
-        objPath: 'assets/torre dupla/montagem_torre_dupla.obj',
-        mtlPath: 'assets/torre dupla/montagem_torre_dupla.mtl',
-        meta: {
-            Cliente: 'VCreate',
-            Ano: '2026',
-            Status: 'Em protótipo',
-            Ferramentas: 'Blender, Three.js, OBJ/MTL'
-        }
+  },
+  5: {
+    title: "Torre Para Hidratação Triatlon",
+    category: "Idealização, modelagem, renderização e impressão 3d",
+    description:
+      "Sistema de hidratação modular de alta performance para bicicletas de contrarrelógio (TT). Projetado para oferecer total liberdade de ajuste ergonômico e aerodinâmico através de uma arquitetura de componentes intercambiáveis e \"stackáveis\"\.",
+    gallery: [
+      "assets/torre dupla/montagem torre dupla - render.png",
+      "assets/torre dupla/3d printed.jpeg",
+    ],
+    details: `Arquitetura Modular: Composto por plate universal e braços substituíveis (suporte duplo, simples ou personalizado).
+
+Ajuste Angular Fino: Espaçadores configuráveis de -20º a +20º, com incrementos precisos de 5º em 5º.
+
+Versatilidade de Montagem: Sistema permite o empilhamento (stacking) de espaçadores para ajuste de altura e angulação em qualquer sequência.
+
+Manufatura Técnica: Desenvolvido com análise de tensões para garantir rigidez estrutural e leveza sob vibração constante.`,
+    modelId: 5,
+    objPath: "assets/torre dupla/montagem_torre_dupla.obj",
+    mtlPath: "assets/torre dupla/montagem_torre_dupla.mtl",
+    meta: {
+      Cliente: "Manzatti Triathlon",
+      Ano: "2026",
+      Status: "Finalizado",
+      Ferramentas: "Fusion, Creality scann, Orca slicer, Impressora FDM de alta precisão",
     },
-    6: {
-        title: 'Olds (Montagem Antiga)',
-        category: 'Modelo 3D Antigo',
-        description: 'Captura de modelo OBJ/MTL legado da pasta olds com visual retro.',
-        gallery: ['assets/torre dupla/3d printed.jpeg', 'assets/torre dupla/montagem torre dupla - render.png'],
-        details: 'Projeto 6: modelo legacy da pasta olds com opção de comparar com torre dupla.',
-        modelId: 6,
-        objPath: 'assets/olds/montagem.obj',
-        mtlPath: 'assets/olds/montagem.mtl',
-        meta: {
-            Cliente: 'VCreate',
-            Ano: '2025',
-            Status: 'Finalizado',
-            Ferramentas: 'Fusion 360, Three.js'
-        }
-    }
+  },
+  6: {
+    title: "Olds (Montagem Antiga)",
+    category: "Modelo 3D Antigo",
+    description:
+      "Captura de modelo OBJ/MTL legado da pasta olds com visual retro.",
+    gallery: [
+      "assets/torre dupla/3d printed.jpeg",
+      "assets/torre dupla/montagem torre dupla - render.png",
+    ],
+    details:
+      "Projeto 6: modelo legacy da pasta olds com opção de comparar com torre dupla.",
+    modelId: 6,
+    objPath: "assets/olds/montagem.obj",
+    mtlPath: "assets/olds/montagem.mtl",
+    meta: {
+      Cliente: "VCreate",
+      Ano: "2025",
+      Status: "Finalizado",
+      Ferramentas: "Fusion 360, Three.js",
+    },
+  },
 };
 
 function openPortfolioDetails(id) {
@@ -733,6 +768,7 @@ function openPortfolioDetails(id) {
     const modal = document.getElementById('portfolioModal');
     modal.className = '';
     modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
 
     // Carrega o modelo 3D no modal, re-usando caminhos do setup
     const modalViewer = document.getElementById('modalViewer');
@@ -747,6 +783,7 @@ function closePortfolioDetails() {
     const modal = document.getElementById('portfolioModal');
     modal.className = 'modal-hidden';
     modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
 }
 
 // ===========================
