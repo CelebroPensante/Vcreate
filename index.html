@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VCreate - Modelagem 3D, Impressão 3D e Engenharia Reversa</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Three.js for 3D Models -->
+    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#home" class="logo">
+                <img src="assets/logo.jpeg" alt="VCreate Logo" class="logo-img">
+    
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="#home" class="nav-link">Início</a>
+                <a href="#about" class="nav-link">Sobre</a>
+                <a href="#services" class="nav-link">Serviços</a>
+                <a href="#portfolio" class="nav-link">Portfólio</a>
+                <a href="#contact" class="nav-link">Contato</a>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>VCreate</h1>
+            <p>Modelagem 3D • Impressão 3D • Engenharia Reversa</p>
+            <p class="hero-subtitle">Transformamos ideias em realidade tridimensional</p>
+            <a href="#portfolio" class="btn btn-primary">
+                <i class="fas fa-arrow-down"></i> Explorar Portfólio
+            </a>
+        </div>
+        <div class="hero-background">
+            <div class="floating-cube"></div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2>Sobre a VCreate</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>Somos uma empresa especializada em soluções inovadoras de modelagem 3D, impressão tridimensional e engenharia reversa. Combinamos tecnologia de ponta com expertise técnica para transformar seus projetos em realidade.</p>
+                    <div class="about-stats">
+                        <div class="stat">
+                            <h3>100+</h3>
+                            <p>Projetos Concluídos</p>
+                        </div>
+                        <div class="stat">
+                            <h3>15+</h3>
+                            <p>Anos Experiência</p>
+                        </div>
+                        <div class="stat">
+                            <h3>50+</h3>
+                            <p>Clientes Satisfeitos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2>Nossos Serviços</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <h3>Modelagem 3D</h3>
+                    <p>Criamos modelos 3D precisos e detalhados a partir de suas especificações e conceitos, utilizando as ferramentas mais avançadas do mercado.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-print"></i>
+                    </div>
+                    <h3>Impressão 3D</h3>
+                    <p>Materializamos seus projetos com impressoras 3D de alta precisão, oferecendo diversos materiais e acabamentos para atender suas necessidades.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-redo"></i>
+                    </div>
+                    <h3>Engenharia Reversa</h3>
+                    <p>Analisamos e reproduzimos componentes existentes, criando modelos digitais precisos para modificação, produção ou documentação técnica.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="portfolio">
+        <div class="container">
+            <h2>Portfólio de Projetos</h2>
+            <div class="portfolio-grid">
+                <!-- Mantido apenas Torre Duplas e Impressão 3D Realizada -->
+
+                <div class="portfolio-item">
+                    <div class="project-3d-viewer" id="viewer5">
+                        <div class="loading">Carregando montagem torre dupla...</div>
+                    </div>
+                    <div class="project-info">
+                        <h3>Montagem Torre Duplas</h3>
+                        <p class="project-category">Modelo 3D Importado</p>
+                        <p class="project-description">Visualização do modelo OBJ/MTL de montagem de torre duplas usando Three.js.</p>
+                        <button class="btn-interact" onclick="openPortfolioDetails(5)">
+                            <i class="fas fa-info-circle"></i> Detalhes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Project 6: Impressão 3D Realizada -->
+                <div class="portfolio-item">
+                    <div class="project-3d-viewer" id="viewer6">
+                        <div class="loading">Carregando visualização 3D...</div>
+                    </div>
+                    <div class="project-info">
+                        <h3>Impressão 3D Realizada</h3>
+                        <p class="project-category">Padrão do Portfólio</p>
+                        <p class="project-description">Modelo real impresso e renderizado com acabamento de alta qualidade.</p>
+                        <button class="btn-interact" onclick="openPortfolioDetails(6)">
+                            <i class="fas fa-info-circle"></i> Detalhes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="portfolioModal" class="modal-hidden" aria-hidden="true">
+        <div class="modal-overlay" onclick="closePortfolioDetails()"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closePortfolioDetails()"><i class="fas fa-times"></i></button>
+            <div class="modal-header">
+                <div>
+                    <h3 id="modalTitle">Detalhes do Projeto</h3>
+                    <p id="modalCategory" class="project-category"></p>
+                </div>
+            </div>
+
+            <div class="modal-layout">
+                <aside class="modal-left">
+                    <p id="modalDescription"></p>
+                    <div class="modal-meta" id="modalMeta"></div>
+                    <div id="modalDetails" class="modal-details"></div>
+                </aside>
+
+                <section class="modal-right">
+                    <div class="preview-title">Visualização do Projeto</div>
+                    <div class="modal-preview-grid">
+                        <div class="modal-3d" id="modal3D">
+                            <div class="project-3d-viewer" id="modalViewer">
+                                <div class="loading">Carregando modelo 3D...</div>
+                            </div>
+                        </div>
+                        <div class="modal-gallery" id="modalGallery"></div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Entre em Contato</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4>Email</h4>
+                            <p>contato@vcreate.com.br</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h4>Telefone</h4>
+                            <p>+55 (11) 9999-9999</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h4>Localização</h4>
+                            <p>São Paulo, SP - Brasil</p>
+                        </div>
+                    </div>
+                </div>
+                <form class="contact-form" id="contactForm">
+                    <input type="text" placeholder="Seu Nome" required>
+                    <input type="email" placeholder="Seu Email" required>
+                    <textarea placeholder="Sua Mensagem" rows="5" required></textarea>
+                    <button type="submit" class="btn btn-primary">Enviar Mensagem</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 VCreate. Todos os direitos reservados.</p>
+            <div class="social-links">
+                <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
