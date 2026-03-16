@@ -19,6 +19,40 @@ document.querySelectorAll('.nav-link').forEach(link => {
 });
 
 // ===========================
+// CARROSSEL HERO
+// ===========================
+
+let currentSlide = 0;
+const slides = document.querySelectorAll('.carousel-slide');
+const indicators = document.querySelectorAll('.indicator');
+
+function showSlide(n) {
+    slides.forEach(slide => slide.classList.remove('active'));
+    indicators.forEach(indicator => indicator.classList.remove('active'));
+    
+    slides[n].classList.add('active');
+    indicators[n].classList.add('active');
+}
+
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+}
+
+// Auto-rotate slides a cada 5 segundos
+if (slides.length > 0) {
+    setInterval(nextSlide, 5000);
+
+    // Clique nos indicadores
+    indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => {
+            currentSlide = index;
+            showSlide(currentSlide);
+        });
+    });
+}
+
+// ===========================
 // MODELOS 3D COM THREE.JS
 // ===========================
 
@@ -751,9 +785,6 @@ function openPortfolioDetails(id) {
         img.alt = project.title;
         gallery.appendChild(img);
     });
-
-    const modalDetails = document.getElementById('modalDetails');
-    modalDetails.textContent = project.details;
 
     const modalMeta = document.getElementById('modalMeta');
     modalMeta.innerHTML = '';
