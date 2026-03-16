@@ -790,30 +790,55 @@ function closePortfolioDetails() {
 // FORM DE CONTATO
 // ===========================
 
-const contactForm = document.getElementById('contactForm');
+document.addEventListener('DOMContentLoaded', () => {
+    const contactForm = document.getElementById('contactForm');
 
-contactForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    // Simular envio do formulário
-    const button = contactForm.querySelector('button');
-    const originalText = button.innerHTML;
-    
-    button.textContent = 'Enviando...';
-    button.disabled = true;
-    
-    setTimeout(() => {
-        button.innerHTML = '<i class="fas fa-check"></i> Mensagem Enviada!';
-        button.style.background = '#22c55e';
-        
-        contactForm.reset();
-        
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.disabled = false;
-            button.style.background = '';
-        }, 2000);
-    }, 1500);
+    contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const button = contactForm.querySelector('button');
+        const originalText = button.innerHTML;
+
+        const subject = contactForm.querySelector('input[name="subject"]').value;
+        const from_name = contactForm.querySelector('input[name="from_name"]').value;
+        const from_email = contactForm.querySelector('input[name="from_email"]').value;
+        const message = contactForm.querySelector('textarea[name="message"]').value;
+
+        console.log('Valores coletados:', { subject, from_name, from_email, message });
+
+        button.textContent = 'Enviando...';
+        button.disabled = true;
+
+        emailjs.send("service_ryz0twu", "template_82ttjct", {
+            subject: subject,
+            from_name: from_name,
+            from_email: from_email,
+            message: message
+        }).then(
+          () => {
+            button.innerHTML = '<i class="fas fa-check"></i> Mensagem Enviada!';
+            button.style.background = "#22c55e";
+            contactForm.reset();
+
+            setTimeout(() => {
+              button.innerHTML = originalText;
+              button.disabled = false;
+              button.style.background = "";
+            }, 2200);
+          },
+          (error) => {
+            console.error("EmailJS erro:", error);
+            button.textContent = "Falha no envio. Tente novamente";
+            button.style.background = "#dc2626";
+
+            setTimeout(() => {
+              button.innerHTML = originalText;
+              button.disabled = false;
+              button.style.background = "";
+            }, 2500);
+          },
+        );
+    });
 });
 
 // ===========================

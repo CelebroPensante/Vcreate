@@ -21,6 +21,14 @@
     
     <!-- CSS -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- EmailJS (versão compatível) -->
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
+        (function(){
+            emailjs.init('pOFDEeuQyC5P146d8');
+        })();
+    </script>
 </head>
 <body>
     <!-- Navigation -->
@@ -217,9 +225,10 @@
                     </div>
                 </div>
                 <form class="contact-form" id="contactForm">
-                    <input type="text" placeholder="Seu Nome" required>
-                    <input type="email" placeholder="Seu Email" required>
-                    <textarea placeholder="Sua Mensagem" rows="5" required></textarea>
+                    <input type="text" name="from_name" placeholder="Seu Nome" required>
+                    <input type="email" name="from_email" placeholder="Seu Email" required>
+                    <input type="text" name="subject" placeholder="Assunto" required>
+                    <textarea name="message" placeholder="Sua Mensagem" rows="5" required></textarea>
                     <button type="submit" class="btn btn-primary">Enviar Mensagem</button>
                 </form>
             </div>
