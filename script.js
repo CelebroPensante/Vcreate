@@ -448,6 +448,9 @@ function createObjModel(container, objPath, mtlPath) {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.setClearColor(0xf8f9fa, 1);
     container.innerHTML = '';
+    
+    // Desativar pointer-events inicialmente para permitir scroll
+    renderer.domElement.style.pointerEvents = 'none';
     container.appendChild(renderer.domElement);
 
     const ambientLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.75);
@@ -488,12 +491,17 @@ function createObjModel(container, objPath, mtlPath) {
     controls.minDistance = 0.6;
     controls.maxDistance = 2.5;
     controls.maxPolarAngle = Math.PI * 0.95;
+    
+    // Desativar interação do usuário inicialmente, mas manter autoRotate ativo
+    controls.enableRotate = false;
+    controls.enableZoom = false;
 
     const controlsState = {
         isDragging: false,
         prevX: 0,
         prevY: 0,
-        loaded: false
+        loaded: false,
+        interactionEnabled: false // Controlar interação do usuário
     };
 
     function loadOBJWithMaterials(materials) {
@@ -566,49 +574,59 @@ function createObjModel(container, objPath, mtlPath) {
         loadOBJWithMaterials(null);
     });
 
-    container.addEventListener('mousedown', (e) => {
-        controlsState.isDragging = true;
-        controlsState.prevX = e.clientX;
-        controlsState.prevY = e.clientY;
+    // Os controles de mouse/touch são gerenciados pelo OrbitControls
+    // Clique no container para ativar a interação
+    container.addEventListener('click', (e) => {
+        if (!controlsState.interactionEnabled && controlsState.loaded) {
+            controlsState.interactionEnabled = true;
+            // Ativar rotação e zoom do usuário
+            controls.enableRotate = true;
+            controls.enableZoom = true;
+            // Permitir que o canvas capture eventos
+            renderer.domElement.style.pointerEvents = 'auto';
+            
+            // Remover o hint de clique com animação suave
+            const hint = container.querySelector('.click-hint');
+            if (hint) {
+                hint.style.animation = 'none';
+                hint.style.opacity = '0';
+                hint.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                hint.style.transition = 'all 0.4s ease-out';
+                hint.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    hint.style.display = 'none';
+                }, 400);
+            }
+        }
     });
 
-    container.addEventListener('mousemove', (e) => {
-        if (!controlsState.isDragging || !controlsState.loaded) return;
-        const deltaX = e.clientX - controlsState.prevX;
-        const deltaY = e.clientY - controlsState.prevY;
-        group.rotation.y += deltaX * 0.005;
-        group.rotation.x += deltaY * 0.005;
-        controlsState.prevX = e.clientX;
-        controlsState.prevY = e.clientY;
+    // Desativar interação ao sair do container (para permitir scroll)
+    container.addEventListener('mouseleave', () => {
+        if (controlsState.interactionEnabled) {
+            controlsState.interactionEnabled = false;
+            // Desativar rotação manual e zoom
+            controls.enableRotate = false;
+            controls.enableZoom = false;
+            // Impedir que canvas capture eventos de scroll
+            renderer.domElement.style.pointerEvents = 'none';
+        }
     });
 
-    ['mouseup', 'mouseleave'].forEach(eventName => {
-        container.addEventListener(eventName, () => {
-            controlsState.isDragging = false;
-        });
-    });
-
-    container.addEventListener('touchstart', (e) => {
-        controlsState.isDragging = true;
-        controlsState.prevX = e.touches[0].clientX;
-        controlsState.prevY = e.touches[0].clientY;
-    });
-
-    container.addEventListener('touchmove', (e) => {
-        if (!controlsState.isDragging || !controlsState.loaded) return;
-        const deltaX = e.touches[0].clientX - controlsState.prevX;
-        const deltaY = e.touches[0].clientY - controlsState.prevY;
-        group.rotation.y += deltaX * 0.005;
-        group.rotation.x += deltaY * 0.005;
-        controlsState.prevX = e.touches[0].clientX;
-        controlsState.prevY = e.touches[0].clientY;
+    // No mobile, desativar após touchend
+    container.addEventListener('touchend', () => {
+        if (controlsState.interactionEnabled) {
+            controlsState.interactionEnabled = false;
+            // Desativar rotação manual e zoom
+            controls.enableRotate = false;
+            controls.enableZoom = false;
+            // Impedir que canvas capture eventos de scroll
+            renderer.domElement.style.pointerEvents = 'none';
+        }
     });
 
     function animate() {
         requestAnimationFrame(animate);
-        if (!controlsState.isDragging && controlsState.loaded) {
-            group.rotation.y += 0.0015;
-        }
+        // Apenas o OrbitControls faz a rotação automática
         controls.update();
         renderer.render(scene, camera);
     }
@@ -625,17 +643,108 @@ function createObjModel(container, objPath, mtlPath) {
     return { scene, camera, renderer, group };
 }
 
-// Inicializar modelos 3D
+// Inicializar modelos 3D e Carrossel do Portfólio
 document.addEventListener('DOMContentLoaded', () => {
-    const v5 = document.getElementById('viewer5');
-    if (v5) {
-        viewers[5] = createObjModel(v5, 'assets/torre dupla/montagem_torre_dupla.obj', 'assets/torre dupla/montagem_torre_dupla.mtl');
+    // Renderizar portfólio dinâmico
+    const visibleProjects = [5, 6]; // Apenas estes 2 projetos são mostrados
+    const portfolioGrid = document.getElementById('portfolioGrid');
+    const portfolioIndicators = document.getElementById('portfolioIndicators');
+    let currentSlide = 0;
+    let isDesktop = window.innerWidth > 768;
+    const itemsPerPage = isDesktop ? 2 : 1;
+
+    function renderPortfolio() {
+        portfolioGrid.innerHTML = '';
+        visibleProjects.forEach(id => {
+            const project = portfolioProjects[id];
+            const item = document.createElement('div');
+            item.className = 'portfolio-item';
+            item.dataset.projectId = id;
+
+            const viewerId = `viewer-${id}`;
+            item.innerHTML = `
+                <div class="project-3d-viewer" id="${viewerId}">
+                    <div class="loading">Carregando modelo 3D...</div>
+                    <div class="click-hint">
+                        <i class="fas fa-hand-pointer"></i>
+                        <span>Clique para interagir</span>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3>${project.title}</h3>
+                    <p class="project-category">${project.category}</p>
+                    <p class="project-description">${project.description}</p>
+                </div>
+            `;
+            portfolioGrid.appendChild(item);
+
+            // Carregar modelo 3D automaticamente
+            const viewer = item.querySelector(`#${viewerId}`);
+            if (project.objPath && project.mtlPath) {
+                viewers[id] = createObjModel(viewer, project.objPath, project.mtlPath);
+            }
+        });
+
+        renderIndicators();
     }
 
-    const v6 = document.getElementById('viewer6');
-    if (v6) {
-        viewers[6] = createObjModel(v6, 'assets/olds/montagem.obj', 'assets/olds/montagem.mtl');
+    function renderIndicators() {
+        portfolioIndicators.innerHTML = '';
+        const numSlides = Math.ceil(visibleProjects.length / itemsPerPage);
+        for (let i = 0; i < numSlides; i++) {
+            const btn = document.createElement('button');
+            btn.className = `portfolio-indicator ${i === currentSlide ? 'active' : ''}`;
+            btn.addEventListener('click', () => goToSlide(i));
+            portfolioIndicators.appendChild(btn);
+        }
     }
+
+    function goToSlide(n) {
+        currentSlide = n;
+        const offset = -n * (100 / (visibleProjects.length / itemsPerPage));
+        portfolioGrid.style.transform = `translateX(${offset}%)`;
+        
+        document.querySelectorAll('.portfolio-indicator').forEach((ind, i) => {
+            ind.classList.toggle('active', i === currentSlide);
+        });
+    }
+
+    function updateCarouselButtons() {
+        const numSlides = Math.ceil(visibleProjects.length / itemsPerPage);
+        const prevBtn = document.getElementById('portfolioPrev');
+        const nextBtn = document.getElementById('portfolioNext');
+        
+        if (prevBtn) prevBtn.disabled = currentSlide === 0;
+        if (nextBtn) nextBtn.disabled = currentSlide === numSlides - 1;
+    }
+
+    // Botões de navegação
+    const prevBtn = document.getElementById('portfolioPrev');
+    const nextBtn = document.getElementById('portfolioNext');
+
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+        if (currentSlide > 0) goToSlide(currentSlide - 1);
+    });
+
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        const numSlides = Math.ceil(visibleProjects.length / itemsPerPage);
+        if (currentSlide < numSlides - 1) goToSlide(currentSlide + 1);
+    });
+
+    // Responsividade
+    window.addEventListener('resize', () => {
+        const wasDesktop = itemsPerPage === 2;
+        isDesktop = window.innerWidth > 768;
+        if ((isDesktop && !wasDesktop) || (!isDesktop && wasDesktop)) {
+            currentSlide = 0;
+            renderPortfolio();
+            updateCarouselButtons();
+        }
+    });
+
+    // Renderizar inicial
+    renderPortfolio();
+    updateCarouselButtons();
 });
 
 function toggleViewer(id) {

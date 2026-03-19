@@ -1,42 +1,46 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VCreate - Modelagem 3D, Impressão 3D e Engenharia Reversa</title>
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Three.js for 3D Models -->
     <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    
+
     <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 
     <!-- EmailJS (versão compatível) -->
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
     <script>
-        (function(){
+        (function () {
             emailjs.init('pOFDEeuQyC5P146d8');
         })();
     </script>
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <a href="#home" class="logo">
                 <img src="assets/logo.jpeg" alt="VCreate Logo" class="logo-img">
-    
+
             </a>
             <div class="nav-links" id="navLinks">
                 <a href="#home" class="nav-link">Início</a>
@@ -60,8 +64,9 @@
                 <span class="hero-badge">Bem-vindo à VCreate</span>
                 <h1>Soluções Técnicas em 3D</h1>
                 <p class="hero-tagline">Modelagem 3D • Impressão 3D • Engenharia Reversa</p>
-                <p class="hero-subtitle">Do escaneamento à peça final. Manufatura avançada para componentes de alta performance</p>
-                
+                <p class="hero-subtitle">Do escaneamento à peça final. Manufatura avançada para componentes de alta
+                    performance</p>
+
                 <div class="hero-cta">
                     <a href="#portfolio" class="btn btn-primary">
                         <i class="fas fa-arrow-right"></i> Ver Portfólio
@@ -129,7 +134,10 @@
             <h2>Sobre a VCreate</h2>
             <div class="about-content">
                 <div class="about-text">
-                    <p>Na VCreate, a precisão não é um detalhe, é a base. Atuamos em todo o ciclo de vida do produto: desde a digitalização e reconstrução de geometrias complexas via Engenharia Reversa, passando pela otimização em Modelagem 3D, até a fabricação final por Impressão 3D. Entregamos componentes que atendem rigorosos critérios de ajuste e funcionalidade.</p>
+                    <p>Na VCreate, a precisão não é um detalhe, é a base. Atuamos em todo o ciclo de vida do produto:
+                        desde a digitalização e reconstrução de geometrias complexas via Engenharia Reversa, passando
+                        pela otimização em Modelagem 3D, até a fabricação final por Impressão 3D. Entregamos componentes
+                        que atendem rigorosos critérios de ajuste e funcionalidade.</p>
                     <div class="about-stats">
                         <div class="stat">
                             <h3>50+</h3>
@@ -159,21 +167,26 @@
                         <i class="fas fa-cube"></i>
                     </div>
                     <h3>Modelagem 3D</h3>
-                    <p>Criamos modelos 3D precisos e detalhados a partir de suas especificações e conceitos, utilizando as ferramentas mais avançadas do mercado.</p>
+                    <p>Criamos modelos 3D precisos e detalhados a partir de suas especificações e conceitos, utilizando
+                        as ferramentas mais avançadas do mercado.</p>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">
                         <i class="fas fa-print"></i>
                     </div>
                     <h3>Impressão 3D</h3>
-                    <p>Produção de componentes funcionais e protótipos de alta fidelidade. Com uma ampla gama de materiais técnicos e processos de precisão, entregamos peças prontas para uso final, com resistência mecânica e acabamento superior.</p>
+                    <p>Produção de componentes funcionais e protótipos de alta fidelidade. Com uma ampla gama de
+                        materiais técnicos e processos de precisão, entregamos peças prontas para uso final, com
+                        resistência mecânica e acabamento superior.</p>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">
                         <i class="fas fa-redo"></i>
                     </div>
                     <h3>Engenharia Reversa</h3>
-                    <p>Digitalização e reconstrução de componentes físicos para o ambiente digital. Atuamos na recuperação de peças descontinuadas e na otimização de mecanismos, gerando documentação técnica precisa para reprodução ou melhoria industrial.</p>
+                    <p>Digitalização e reconstrução de componentes físicos para o ambiente digital. Atuamos na
+                        recuperação de peças descontinuadas e na otimização de mecanismos, gerando documentação técnica
+                        precisa para reprodução ou melhoria industrial.</p>
                 </div>
             </div>
         </div>
@@ -183,30 +196,25 @@
     <section id="portfolio" class="portfolio">
         <div class="container">
             <h2>Portfólio de Projetos</h2>
-            <div class="portfolio-grid">
-                <!-- Mantido apenas Torre Duplas e Impressão 3D Realizada -->
 
-                <div class="portfolio-item">
-                    <div class="project-3d-viewer" id="viewer5">
-                        <div class="loading">Carregando visualização 3D....</div>
-                    </div>
-                    <div class="project-info">
-                        <h3>Torre Para Hidratação Triatlon</h3>
-                        <p class="project-category">Idealização, modelagem, renderização e impressão 3d</p>
-                        <p class="project-description">Utilizado em bicicletas de alto nivel para facilitar a hidratação durante a competição durante provas longas.</p>
+            <div class="portfolio-wrapper">
+                <div class="portfolio-carousel">
+                    <div class="portfolio-grid" id="portfolioGrid">
+                        <!-- Projects will be rendered here by JavaScript -->
                     </div>
                 </div>
 
-                <!-- Project 6: Impressão 3D Realizada -->
-                <div class="portfolio-item">
-                    <div class="project-3d-viewer" id="viewer6">
-                        <div class="loading">Carregando visualização 3D...</div>
-                    </div>
-                    <div class="project-info">
-                        <h3>Impressão 3D Realizada</h3>
-                        <p class="project-category">Padrão do Portfólio</p>
-                        <p class="project-description">Modelo real impresso e renderizado com acabamento de alta qualidade.</p>
-                    </div>
+                <div class="portfolio-controls">
+                    <button class="carousel-btn prev" id="portfolioPrev" aria-label="Projeto anterior">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-btn next" id="portfolioNext" aria-label="Próximo projeto">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="portfolio-indicators" id="portfolioIndicators">
+                    <!-- Indicators will be added by JavaScript -->
                 </div>
             </div>
         </div>
@@ -261,4 +269,5 @@
     <!-- JavaScript -->
     <script src="script.js"></script>
 </body>
+
 </html>
