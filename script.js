@@ -645,47 +645,112 @@ function createObjModel(container, objPath, mtlPath) {
 
 // Inicializar modelos 3D e Carrossel do Portfólio
 document.addEventListener('DOMContentLoaded', () => {
-    // Renderizar portfólio dinâmico
-    const visibleProjects = [5, 6]; // Apenas estes 2 projetos são mostrados
+    // 1. VARIÁVEIS INICIAIS
+    const visibleProjects = [5, 6]; 
     const portfolioGrid = document.getElementById('portfolioGrid');
     const portfolioIndicators = document.getElementById('portfolioIndicators');
+    const prevBtn = document.getElementById('portfolioPrev');
+    const nextBtn = document.getElementById('portfolioNext');
+    
     let currentSlide = 0;
     let isDesktop = window.innerWidth > 768;
-    const itemsPerPage = isDesktop ? 2 : 1;
+    let itemsPerPage = isDesktop ? 2 : 1;
+    let autoPlayInterval; // Variável para o tempo
 
+    // 2. FUNÇÃO PARA RENDERIZAR (CRIAR OS ITENS)
     function renderPortfolio() {
-        portfolioGrid.innerHTML = '';
-        visibleProjects.forEach(id => {
-            const project = portfolioProjects[id];
-            const item = document.createElement('div');
-            item.className = 'portfolio-item';
-            item.dataset.projectId = id;
+      // Limpa o conteúdo atual da grade
+      portfolioGrid.innerHTML = "";
 
-            const viewerId = `viewer-${id}`;
-            item.innerHTML = `
-                <div class="project-3d-viewer" id="${viewerId}">
-                    <div class="loading">Carregando modelo 3D...</div>
-                    <div class="click-hint">
-                        <i class="fas fa-hand-pointer"></i>
-                        <span>Clique para interagir</span>
-                    </div>
-                </div>
-                <div class="project-info">
-                    <h3>${project.title}</h3>
-                    <p class="project-category">${project.category}</p>
-                    <p class="project-description">${project.description}</p>
-                </div>
-            `;
-            portfolioGrid.appendChild(item);
+      visibleProjects.forEach((id) => {
+        const project = portfolioProjects[id];
+        const item = document.createElement("div");
+        item.className = "portfolio-item";
 
-            // Carregar modelo 3D automaticamente
-            const viewer = item.querySelector(`#${viewerId}`);
-            if (project.objPath && project.mtlPath) {
-                viewers[id] = createObjModel(viewer, project.objPath, project.mtlPath);
-            }
+        const viewerId = `viewer-${id}`;
+        item.innerHTML = `
+            <div class="project-3d-viewer" id="${viewerId}">
+                <div class="loading">Carregando modelo 3D...</div>
+                <div class="click-hint">
+                    <i class="fas fa-hand-pointer"></i>
+                    <span>Clique para interagir</span>
+                </div>
+            </div>
+            <div class="project-info">
+                <h3>${project.title}</h3>
+                <p class="project-category">${project.category}</p>
+                <p class="project-description">${project.description}</p>
+            </div>
+        `;
+
+        // Adiciona o item à grade primeiro para garantir que o DOM o reconheça
+        portfolioGrid.appendChild(item);
+
+        // Seleciona o contêiner do visualizador para adicionar os controles de pausa
+        const viewerContainer = item.querySelector(".project-3d-viewer");
+
+        // PAUSA o carrossel quando o mouse ou o toque entra na área 3D
+        viewerContainer.addEventListener("pointerenter", () => {
+          stopAutoPlay();
+          console.log("Autoplay pausado para interação 3D");
         });
 
-        renderIndicators();
+        // RETOMA o carrossel quando o mouse ou o toque sai da área 3D
+        viewerContainer.addEventListener("pointerleave", () => {
+          startAutoPlay();
+          console.log("Autoplay retomado");
+        });
+
+        // Inicializa o modelo 3D
+        const viewer = item.querySelector(`#${viewerId}`);
+        if (project.objPath && project.mtlPath) {
+          // Assume que 'viewers' e 'createObjModel' estão definidos globalmente
+          viewers[id] = createObjModel(
+            viewer,
+            project.objPath,
+            project.mtlPath,
+          );
+        }
+      });
+
+      // Atualiza as bolinhas de navegação
+      renderIndicators();
+    }
+
+    // 3. FUNÇÃO PARA MOVER O SLIDE
+    function goToSlide(n) {
+        const numSlides = Math.ceil(visibleProjects.length / itemsPerPage);
+        if (n < 0 || n >= numSlides) return;
+
+        currentSlide = n;
+        const offset = -n * 100; // O pulo de 100% que ajustamos no CSS
+        portfolioGrid.style.transform = `translateX(${offset}%)`;
+
+        document.querySelectorAll('.portfolio-indicator').forEach((ind, i) => {
+            ind.classList.toggle('active', i === currentSlide);
+        });
+        updateCarouselButtons();
+    }
+
+    // 4. FUNÇÃO DO TEMPO (AUTOPLAY)
+function startAutoPlay() {
+  if (autoPlayInterval) clearInterval(autoPlayInterval); // Prevenção
+  autoPlayInterval = setInterval(() => {
+    const numSlides = Math.ceil(visibleProjects.length / itemsPerPage);
+    let next = (currentSlide + 1) % numSlides;
+    goToSlide(next);
+  }, 5000);
+}
+
+function stopAutoPlay() {
+  clearInterval(autoPlayInterval);
+}
+
+    // 5. ATUALIZAR BOTÕES E INDICADORES
+    function updateCarouselButtons() {
+        const numSlides = Math.ceil(visibleProjects.length / itemsPerPage);
+        if (prevBtn) prevBtn.disabled = currentSlide === 0;
+        if (nextBtn) nextBtn.disabled = currentSlide === numSlides - 1;
     }
 
     function renderIndicators() {
@@ -694,58 +759,39 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < numSlides; i++) {
             const btn = document.createElement('button');
             btn.className = `portfolio-indicator ${i === currentSlide ? 'active' : ''}`;
-            btn.addEventListener('click', () => goToSlide(i));
+            btn.addEventListener('click', () => {
+                goToSlide(i);
+                startAutoPlay(); // Reinicia o tempo ao clicar
+            });
             portfolioIndicators.appendChild(btn);
         }
     }
 
-    function goToSlide(n) {
-        currentSlide = n;
-        const offset = -n * (100 / (visibleProjects.length / itemsPerPage));
-        portfolioGrid.style.transform = `translateX(${offset}%)`;
-        
-        document.querySelectorAll('.portfolio-indicator').forEach((ind, i) => {
-            ind.classList.toggle('active', i === currentSlide);
-        });
-    }
-
-    function updateCarouselButtons() {
-        const numSlides = Math.ceil(visibleProjects.length / itemsPerPage);
-        const prevBtn = document.getElementById('portfolioPrev');
-        const nextBtn = document.getElementById('portfolioNext');
-        
-        if (prevBtn) prevBtn.disabled = currentSlide === 0;
-        if (nextBtn) nextBtn.disabled = currentSlide === numSlides - 1;
-    }
-
-    // Botões de navegação
-    const prevBtn = document.getElementById('portfolioPrev');
-    const nextBtn = document.getElementById('portfolioNext');
-
+    // 6. EVENTOS DE CLIQUE
     if (prevBtn) prevBtn.addEventListener('click', () => {
-        if (currentSlide > 0) goToSlide(currentSlide - 1);
+        goToSlide(currentSlide - 1);
+        startAutoPlay();
     });
 
     if (nextBtn) nextBtn.addEventListener('click', () => {
-        const numSlides = Math.ceil(visibleProjects.length / itemsPerPage);
-        if (currentSlide < numSlides - 1) goToSlide(currentSlide + 1);
+        goToSlide(currentSlide + 1);
+        startAutoPlay();
     });
 
-    // Responsividade
+    // 7. RESPONSIVIDADE
     window.addEventListener('resize', () => {
-        const wasDesktop = itemsPerPage === 2;
         isDesktop = window.innerWidth > 768;
-        if ((isDesktop && !wasDesktop) || (!isDesktop && wasDesktop)) {
-            currentSlide = 0;
-            renderPortfolio();
-            updateCarouselButtons();
-        }
+        itemsPerPage = isDesktop ? 2 : 1;
+        currentSlide = 0;
+        renderPortfolio();
+        goToSlide(0);
     });
 
-    // Renderizar inicial
+    // INICIALIZAÇÃO
     renderPortfolio();
     updateCarouselButtons();
-});
+    startAutoPlay(); // Começa a passar sozinho
+}); // Fim do DOMContentLoaded
 
 function toggleViewer(id) {
     // Já está sendo exibido, apenas animamos
@@ -833,7 +879,7 @@ const portfolioProjects = {
     title: "Torre Para Hidratação Triatlon",
     category: "Idealização, modelagem, renderização e impressão 3d",
     description:
-      "Sistema de hidratação modular de alta performance para bicicletas de contrarrelógio (TT). Projetado para oferecer total liberdade de ajuste ergonômico e aerodinâmico através de uma arquitetura de componentes intercambiáveis e \"stackáveis\"\.",
+      'Sistema de hidratação modular de alta performance para bicicletas de contrarrelógio (TT). Projetado para oferecer total liberdade de ajuste ergonômico e aerodinâmico através de uma arquitetura de componentes intercambiáveis e "stackáveis"\.',
     gallery: [
       "assets/torre dupla/montagem torre dupla - render.png",
       "assets/torre dupla/3d printed.jpeg",
@@ -852,14 +898,15 @@ Manufatura Técnica: Desenvolvido com análise de tensões para garantir rigidez
       Cliente: "Manzatti Triathlon",
       Ano: "2026",
       Status: "Finalizado",
-      Ferramentas: "Fusion, Creality scann, Orca slicer, Impressora FDM de alta precisão",
+      Ferramentas:
+        "Fusion, Creality scann, Orca slicer, Impressora FDM de alta precisão",
     },
   },
   6: {
-    title: "Olds (Montagem Antiga)",
-    category: "Modelo 3D Antigo",
+    title: "Pedal de automovel exclusivo",
+    category: "Modelagem, desenvolvimento, clonagem",
     description:
-      "Captura de modelo OBJ/MTL legado da pasta olds com visual retro.",
+      "Desenvolvido sob medida para oficinas de restauração, este pedal une a estética clássica à precisão da modelagem 3D. O projeto foca no acabamento visual impecável, ideal para compor interiores de carros antigos que exigem peças exclusivas e personalizadas.",
     gallery: [
       "assets/torre dupla/3d printed.jpeg",
       "assets/torre dupla/montagem torre dupla - render.png",
@@ -932,6 +979,26 @@ function closePortfolioDetails() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const contactForm = document.getElementById('contactForm');
+
+    // Configura a troca automática a cada 5 segundos
+    let autoPlayInterval = setInterval(() => {
+        const numSlides = Math.ceil(visibleProjects.length / itemsPerPage);
+        let next = (currentSlide + 1) % numSlides;
+        goToSlide(next);
+    }, 5000);
+
+    // Para o autoplay se o usuário clicar nos botões (evita pular dois de vez)
+    const resetTimer = () => {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = setInterval(() => {
+            const numSlides = Math.ceil(visibleProjects.length / itemsPerPage);
+            let next = (currentSlide + 1) % numSlides;
+            goToSlide(next);
+        }, 8000); // Dá mais tempo após interação manual
+    };
+
+    if (prevBtn) prevBtn.addEventListener('click', resetTimer);
+    if (nextBtn) nextBtn.addEventListener('click', resetTimer);
 
     contactForm.addEventListener('submit', (e) => {
         e.preventDefault();

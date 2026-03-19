@@ -528,13 +528,15 @@ body {
 }
 
 .portfolio-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-wrap: nowrap;
     gap: 40px;
     transition: transform 0.5s ease;
+    width: 100%;
 }
 
 .portfolio-item {
+    flex: 0 0 calc(50% - 20px);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;
@@ -996,7 +998,8 @@ body {
     }
 
     .portfolio-grid {
-        grid-template-columns: 1fr;
+        display: flex;
+        gap: 0;
     }
 
     .project-3d-viewer {
@@ -1029,7 +1032,16 @@ body {
     }
 
     .portfolio-grid {
-        grid-template-columns: 1fr;
+        display: flex;
+        gap: 0;
+    }
+
+
+    .portfolio-item {
+        flex: 0 0 100%;
+            /* Força cada item a ter 100% da largura da tela */
+        padding: 0 10px;
+            /* Adiciona um respiro nas laterais */
     }
 
     .footer .container {
