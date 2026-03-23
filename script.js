@@ -4,17 +4,23 @@
 
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('navLinks');
+const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-hamburger.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
-    hamburger.classList.toggle('active');
-});
+if (hamburger && navLinks) {
+    hamburger.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        hamburger.classList.toggle('active');
+    });
+}
 
 // Fechar menu ao clicar em um link
 document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => {
-        navLinks.classList.remove('active');
-        hamburger.classList.remove('active');
+        if (navLinks && hamburger) {
+            navLinks.classList.remove('active');
+            hamburger.classList.remove('active');
+        }
     });
 });
 
@@ -22,9 +28,17 @@ document.querySelectorAll('.nav-link').forEach(link => {
 // CARROSSEL HERO
 // ===========================
 
-let currentSlide = 0;
+let heroCurrentSlide = 0;
 const slides = document.querySelectorAll('.carousel-slide');
 const indicators = document.querySelectorAll('.indicator');
+const heroCarousel = document.querySelector('.hero-carousel');
+let heroAutoPlayId;
+const heroAutoPlayDelay = isTouchDevice ? 7000 : 5000;
+
+document.querySelectorAll('.carousel-slide video').forEach((video) => {
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+});
 
 function showSlide(n) {
     slides.forEach(slide => slide.classList.remove('active'));
@@ -35,20 +49,120 @@ function showSlide(n) {
 }
 
 function nextSlide() {
-    currentSlide = (currentSlide + 1) % slides.length;
-    showSlide(currentSlide);
+    heroCurrentSlide = (heroCurrentSlide + 1) % slides.length;
+    showSlide(heroCurrentSlide);
+}
+
+function prevSlide() {
+    heroCurrentSlide = (heroCurrentSlide - 1 + slides.length) % slides.length;
+    showSlide(heroCurrentSlide);
+}
+
+function bindHorizontalSwipe(container, callbacks, options = {}) {
+    if (!container) return;
+
+    const threshold = options.threshold || 48;
+    const ignoreSelector = options.ignoreSelector;
+
+    let isPointerDown = false;
+    let startX = 0;
+    let startY = 0;
+    let canSwipe = true;
+
+    container.addEventListener('dragstart', (event) => {
+        event.preventDefault();
+    });
+
+    container.addEventListener('pointerdown', (event) => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        if (ignoreSelector && event.target.closest(ignoreSelector)) return;
+
+        isPointerDown = true;
+        canSwipe = true;
+        startX = event.clientX;
+        startY = event.clientY;
+
+        if (callbacks.onStart) callbacks.onStart();
+    }, { passive: true });
+
+    container.addEventListener('pointermove', (event) => {
+        if (!isPointerDown || !canSwipe) return;
+
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+
+        // Só considera gesto horizontal dominante para não atrapalhar o scroll.
+        if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 12) {
+            canSwipe = false;
+        }
+    }, { passive: true });
+
+    function finishSwipe(event) {
+        if (!isPointerDown) return;
+
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+        const isHorizontal = Math.abs(dx) > Math.abs(dy);
+
+        if (canSwipe && isHorizontal && Math.abs(dx) >= threshold) {
+            if (dx < 0 && callbacks.onNext) callbacks.onNext();
+            if (dx > 0 && callbacks.onPrev) callbacks.onPrev();
+        }
+
+        isPointerDown = false;
+        canSwipe = true;
+        if (callbacks.onEnd) callbacks.onEnd();
+    }
+
+    container.addEventListener('pointerup', finishSwipe, { passive: true });
+    container.addEventListener('pointercancel', () => {
+        isPointerDown = false;
+        canSwipe = true;
+        if (callbacks.onEnd) callbacks.onEnd();
+    }, { passive: true });
+}
+
+function stopHeroAutoPlay() {
+    if (heroAutoPlayId) {
+        clearInterval(heroAutoPlayId);
+    }
+}
+
+function startHeroAutoPlay() {
+    if (slides.length < 2 || prefersReducedMotion || document.hidden) {
+        return;
+    }
+
+    stopHeroAutoPlay();
+    heroAutoPlayId = setInterval(nextSlide, heroAutoPlayDelay);
 }
 
 // Auto-rotate slides a cada 5 segundos
 if (slides.length > 0) {
-    setInterval(nextSlide, 5000);
+    startHeroAutoPlay();
+
+    bindHorizontalSwipe(heroCarousel, {
+        onStart: stopHeroAutoPlay,
+        onNext: nextSlide,
+        onPrev: prevSlide,
+        onEnd: startHeroAutoPlay
+    });
 
     // Clique nos indicadores
     indicators.forEach((indicator, index) => {
         indicator.addEventListener('click', () => {
-            currentSlide = index;
-            showSlide(currentSlide);
+            heroCurrentSlide = index;
+            showSlide(heroCurrentSlide);
+            startHeroAutoPlay();
         });
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopHeroAutoPlay();
+        } else {
+            startHeroAutoPlay();
+        }
     });
 }
 
@@ -436,9 +550,9 @@ function createOctahedron(container) {
 function createObjModel(container, objPath, mtlPath) {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: !isTouchDevice, alpha: true });
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isTouchDevice ? 1.5 : 2));
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.physicallyCorrectLights = true;
@@ -485,8 +599,8 @@ function createObjModel(container, objPath, mtlPath) {
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.7;
+    controls.autoRotate = !prefersReducedMotion;
+    controls.autoRotateSpeed = isTouchDevice ? 0.45 : 0.7;
     controls.enablePan = false;
     controls.minDistance = 0.6;
     controls.maxDistance = 2.5;
@@ -622,7 +736,7 @@ function createObjModel(container, objPath, mtlPath) {
             // Impedir que canvas capture eventos de scroll
             renderer.domElement.style.pointerEvents = 'none';
         }
-    });
+    }, { passive: true });
 
     function animate() {
         requestAnimationFrame(animate);
@@ -632,13 +746,18 @@ function createObjModel(container, objPath, mtlPath) {
     }
     animate();
 
+    let resizeRafId;
     window.addEventListener('resize', () => {
-        const width = container.clientWidth;
-        const height = container.clientHeight;
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        renderer.setSize(width, height);
-    });
+        if (resizeRafId) return;
+        resizeRafId = requestAnimationFrame(() => {
+            resizeRafId = null;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        });
+    }, { passive: true });
 
     return { scene, camera, renderer, group };
 }
@@ -648,6 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. VARIÁVEIS INICIAIS
     const visibleProjects = [5, 6]; 
     const portfolioGrid = document.getElementById('portfolioGrid');
+    const portfolioCarousel = document.querySelector('.portfolio-carousel');
     const portfolioIndicators = document.getElementById('portfolioIndicators');
     const prevBtn = document.getElementById('portfolioPrev');
     const nextBtn = document.getElementById('portfolioNext');
@@ -690,16 +810,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const viewerContainer = item.querySelector(".project-3d-viewer");
 
         // PAUSA o carrossel quando o mouse ou o toque entra na área 3D
-        viewerContainer.addEventListener("pointerenter", () => {
-          stopAutoPlay();
-          console.log("Autoplay pausado para interação 3D");
-        });
+                viewerContainer.addEventListener("pointerenter", () => {
+                    stopAutoPlay();
+                });
 
         // RETOMA o carrossel quando o mouse ou o toque sai da área 3D
         viewerContainer.addEventListener("pointerleave", () => {
           startAutoPlay();
-          console.log("Autoplay retomado");
         });
+
+                viewerContainer.addEventListener("pointerdown", () => {
+                    stopAutoPlay();
+                }, { passive: true });
+
+                viewerContainer.addEventListener("pointerup", () => {
+                    startAutoPlay();
+                }, { passive: true });
 
         // Inicializa o modelo 3D
         const viewer = item.querySelector(`#${viewerId}`);
@@ -734,12 +860,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. FUNÇÃO DO TEMPO (AUTOPLAY)
 function startAutoPlay() {
+    if (prefersReducedMotion || document.hidden) return;
   if (autoPlayInterval) clearInterval(autoPlayInterval); // Prevenção
   autoPlayInterval = setInterval(() => {
     const numSlides = Math.ceil(visibleProjects.length / itemsPerPage);
     let next = (currentSlide + 1) % numSlides;
     goToSlide(next);
-  }, 5000);
+    }, isTouchDevice ? 7000 : 5000);
 }
 
 function stopAutoPlay() {
@@ -778,13 +905,35 @@ function stopAutoPlay() {
         startAutoPlay();
     });
 
+    bindHorizontalSwipe(portfolioCarousel, {
+        onStart: stopAutoPlay,
+        onNext: () => goToSlide(Math.min(currentSlide + 1, Math.ceil(visibleProjects.length / itemsPerPage) - 1)),
+        onPrev: () => goToSlide(Math.max(currentSlide - 1, 0)),
+        onEnd: startAutoPlay
+    }, {
+        threshold: 42,
+        ignoreSelector: '.project-3d-viewer'
+    });
+
     // 7. RESPONSIVIDADE
+    let portfolioResizeTimer;
     window.addEventListener('resize', () => {
+        clearTimeout(portfolioResizeTimer);
+        portfolioResizeTimer = setTimeout(() => {
         isDesktop = window.innerWidth > 768;
         itemsPerPage = isDesktop ? 2 : 1;
         currentSlide = 0;
         renderPortfolio();
         goToSlide(0);
+        }, 180);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopAutoPlay();
+        } else {
+            startAutoPlay();
+        }
     });
 
     // INICIALIZAÇÃO
@@ -980,25 +1129,7 @@ function closePortfolioDetails() {
 document.addEventListener('DOMContentLoaded', () => {
     const contactForm = document.getElementById('contactForm');
 
-    // Configura a troca automática a cada 5 segundos
-    let autoPlayInterval = setInterval(() => {
-        const numSlides = Math.ceil(visibleProjects.length / itemsPerPage);
-        let next = (currentSlide + 1) % numSlides;
-        goToSlide(next);
-    }, 5000);
-
-    // Para o autoplay se o usuário clicar nos botões (evita pular dois de vez)
-    const resetTimer = () => {
-        clearInterval(autoPlayInterval);
-        autoPlayInterval = setInterval(() => {
-            const numSlides = Math.ceil(visibleProjects.length / itemsPerPage);
-            let next = (currentSlide + 1) % numSlides;
-            goToSlide(next);
-        }, 8000); // Dá mais tempo após interação manual
-    };
-
-    if (prevBtn) prevBtn.addEventListener('click', resetTimer);
-    if (nextBtn) nextBtn.addEventListener('click', resetTimer);
+    if (!contactForm) return;
 
     contactForm.addEventListener('submit', (e) => {
         e.preventDefault();
