@@ -550,9 +550,10 @@ function createOctahedron(container) {
 function createObjModel(container, objPath, mtlPath) {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: !isTouchDevice, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isTouchDevice ? 1.5 : 2));
+    const maxPixelRatio = isTouchDevice ? 2 : 2.5;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.physicallyCorrectLights = true;
@@ -755,6 +756,7 @@ function createObjModel(container, objPath, mtlPath) {
             const height = container.clientHeight;
             camera.aspect = width / height;
             camera.updateProjectionMatrix();
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
             renderer.setSize(width, height);
         });
     }, { passive: true });
@@ -774,6 +776,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let currentSlide = 0;
     let isDesktop = window.innerWidth > 768;
+    let lastViewportWidth = window.innerWidth;
     let itemsPerPage = isDesktop ? 2 : 1;
     let autoPlayInterval; // Variável para o tempo
 
@@ -920,7 +923,19 @@ function stopAutoPlay() {
     window.addEventListener('resize', () => {
         clearTimeout(portfolioResizeTimer);
         portfolioResizeTimer = setTimeout(() => {
-        isDesktop = window.innerWidth > 768;
+        const nextViewportWidth = window.innerWidth;
+        const widthDelta = Math.abs(nextViewportWidth - lastViewportWidth);
+        const nextIsDesktop = nextViewportWidth > 768;
+        const changedLayoutMode = nextIsDesktop !== isDesktop;
+
+        // Em mobile, o scroll pode disparar resize por causa da barra do navegador.
+        // Só rerenderiza quando muda o modo desktop/mobile ou há grande variação real de largura.
+        if (!changedLayoutMode && widthDelta < 80) {
+            return;
+        }
+
+        isDesktop = nextIsDesktop;
+        lastViewportWidth = nextViewportWidth;
         itemsPerPage = isDesktop ? 2 : 1;
         currentSlide = 0;
         renderPortfolio();
